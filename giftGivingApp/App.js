@@ -6,6 +6,8 @@ import LoginScreen from "./src/screens/LoginScreen";
 import HomeScreen from "./src/screens/HomeScreen";
 import AddGiftScreen from "./src/screens/AddGiftScreen";
 import CalendarScreen from "./src/screens/CalendarScreen";
+import { SafeAreaView } from 'react-native';
+import LoginComponent from './src/screens/Login'; 
 
 const Stack = createStackNavigator();
 
@@ -20,16 +22,9 @@ const styles = StyleSheet.create({
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <NavigationContainer style={styles.container}>
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Add Gift" component={AddGiftScreen} />
-          <Stack.Screen name="Calendar" component={CalendarScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-      <StatusBar style="auto" />
-    </View>
+    
+    <SafeAreaView style={styles.container}>
+      <LoginComponent />
+    </SafeAreaView>
   );
 }
