@@ -6,12 +6,12 @@ import { getFirestore } from "firebase/firestore";
 console.log(process.env.REACT_APP_FIREBASE_API_KEY);
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD28PhP0uc7DMXW-8oTQh43KyH77WCo7PE",
-    authDomain: "fir-db-6ccaf.firebaseapp.com",
-    projectId: "fir-db-6ccaf",
-    storageBucket: "fir-db-6ccaf.appspot.com",
-    messagingSenderId: "703615629491",
-    appId: "1:703615629491:web:f43bdcf523a542deb6d8c6"
+    REACT_APP_FIREBASE_API_KEY=AIzaSyD28PhP0uc7DMXW-8oTQh43KyH77WCo7PE
+    REACT_APP_FIREBASE_AUTH_DOMAIN=fir-db-6ccaf.firebaseapp.com
+    REACT_APP_FIREBASE_PROJECT_ID=fir-db-6ccaf
+    REACT_APP_FIREBASE_STORAGE_BUCKET=fir-db-6ccaf.appspot.com
+    REACT_APP_FIREBASE_MESSAGING_SENDER_ID=703615629491
+    REACT_APP_FIREBASE_APP_ID=1:703615629491:web:f43bdcf523a542deb6d8c6
 };
   
 
