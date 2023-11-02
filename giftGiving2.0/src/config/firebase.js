@@ -3,19 +3,20 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 
-console.log(process.env.REACT_APP_FIREBASE_API_KEY);
+// console.log(process.env.REACT_APP_FIREBASE_API_KEY);
 
 const firebaseConfig = {
-    REACT_APP_FIREBASE_API_KEY=AIzaSyD28PhP0uc7DMXW-8oTQh43KyH77WCo7PE
-    REACT_APP_FIREBASE_AUTH_DOMAIN=fir-db-6ccaf.firebaseapp.com
-    REACT_APP_FIREBASE_PROJECT_ID=fir-db-6ccaf
-    REACT_APP_FIREBASE_STORAGE_BUCKET=fir-db-6ccaf.appspot.com
-    REACT_APP_FIREBASE_MESSAGING_SENDER_ID=703615629491
-    REACT_APP_FIREBASE_APP_ID=1:703615629491:web:f43bdcf523a542deb6d8c6
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
-  
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-export const db = getFirestore();
+const db = getFirestore(app);
+
+export { db };
