@@ -99,6 +99,7 @@ export default function App() {
             <Tab.Screen
               name="Calendar"
               component={CalendarScreen}
+              initialParams={{ username: username }}
               options={{
                 tabBarIcon: ({ color }) => (
                   <MaterialCommunityIcons
