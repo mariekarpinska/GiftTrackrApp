@@ -3,68 +3,80 @@ import { View, Text, StyleSheet, Dimensions, TextInput } from "react-native";
 import { Calendar } from "react-native-calendars";
 import moment from "moment";
 import { styles } from "../styles";
-import CustomButton from "../components/CustomButton";
+import { collection, query, where, doc, getDoc, getDocs } from "@firebase/firestore";
+import { db } from "../config/firebase";
+import { useFocusEffect } from "@react-navigation/native";
 
-const CalendarScreen = () => {
+
+const CalendarScreen = (props) => {
+  const { username } = props.route.params;
   const [markedDates, setMarkedDates] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
-  const [eventNames, setEventNames] = useState({});
-  const [newEventName, setNewEventName] = useState("");
-  const dotColor = '#C6E9F7';
 
-  const events = {};
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchDates();
+    }, [props.route.params.username])
+  );
 
-  useEffect(() => {
-    const initialMarkedDates = {};
-    for (const date in events) {
-      initialMarkedDates[date] = {
-        selected: true,
-        marked: true,
-        dotColor,
-      };
+  const fetchDates = async () => {
+    try {
+      const usersRef = collection(db, "users");
+      const userQuery = query(usersRef, where("username", "==", username));
+      const userQuerySnapshot = await getDocs(userQuery);
+  
+      if (!userQuerySnapshot.empty) {
+        const markedDatesData = {};
+  
+        for (const userDoc of userQuerySnapshot.docs) {
+          const userData = userDoc.data();
+          const userGiftIDs = userData.gifts || [];
+  
+          for (const giftID of userGiftIDs) {
+            const giftRef = doc(db, "gifts", giftID);
+            const giftDoc = await getDoc(giftRef);
+  
+            if (giftDoc.exists()) {
+              const date = moment(giftDoc.data().date).format("YYYY-MM-DD");
+              markedDatesData[date] = {
+                selected: true,
+                marked: true,
+                dotColor: "#C6E9F7",
+              };
+              
+            }
+          }
+        }
+  
+        setMarkedDates(markedDatesData);
+        console.log("Dates fetched successfully");
+      } else {
+        console.log("No gifts found");
+      }
+    } catch (error) {
+      console.error("Error fetching dates: ", error);
     }
-    setMarkedDates(initialMarkedDates);
-  }, []);
+  };
+  
 
   const handleDayPress = (day) => {
     const date = day.dateString;
     setSelectedDate(date);
-    setNewEventName(eventNames[date] || "");
-  };
+  
+    // Convert the selected date to timestamp format
+    const selectedTimestamp = new Date(date).getTime();
+    //const selectedTimestamp = moment(selectedDate).valueOf(); // Get the Unix timestamp
 
-  const handleAddEvent = () => {
-    if (selectedDate) {
-      const updatedEventNames = { ...eventNames };
-      updatedEventNames[selectedDate] = newEventName;
-      setEventNames(updatedEventNames);
-
-      // Show a small blue dot underneath the selected date
-      setMarkedDates((prevMarkedDates) => ({
-        ...prevMarkedDates,
-        [selectedDate]: {
-          ...prevMarkedDates[selectedDate],
-          selected: true,
-          marked: true,
-          dotColor,
-        },
-      }));
-    }
-  };
-
-  const handleRemoveEvent = () => {
-    if (selectedDate) {
-      const updatedEventNames = { ...eventNames };
-      delete updatedEventNames[selectedDate];
-      setEventNames(updatedEventNames);
-
-      // Remove the dot from the selected date
-      setMarkedDates((prevMarkedDates) => {
-        const updatedMarkedDates = { ...prevMarkedDates };
-        if (updatedMarkedDates[selectedDate]) {
-          delete updatedMarkedDates[selectedDate];
-        }
-        return updatedMarkedDates;
-      });
+  
+    // Log the selected date and markedDates format to the console
+    console.log("Selected Date:", date);
+    console.log("Marked Dates Format:", Object.keys(markedDates)[0]);
+  
+    // Now you can compare the converted timestamp with the marked dates
+    if (markedDates[selectedTimestamp]) {
+      console.log("Date matched in markedDates!");
+    } else {
+      console.log("Date not found in markedDates");
     }
   };
 
@@ -80,34 +92,21 @@ const CalendarScreen = () => {
     >
       <Text style={styles.pageHeader}>Calendar</Text>
       <View style={{ paddingVertical: 0, width: "100%" }}>
-        <Calendar style={{
-          borderColor: '#C6E9F7',
-          backgroundColor: '#C6E9F7',
-        }}
-
-  markedDates={markedDates} onDayPress={handleDayPress} enableSwipeMonths={true} />
+        <Calendar
+          style={{
+            borderColor: "#C6E9F7",
+            backgroundColor: "#C6E9F7",
+          }}
+          markedDates={markedDates}
+          onDayPress={handleDayPress}
+          enableSwipeMonths={true}
+        />
       </View>
       {selectedDate && (
         <View style={unique_styles.agendaContainer}>
           <Text style={unique_styles.dateText}>
             {moment(selectedDate).format("MMMM D, YYYY")}
           </Text>
-          {eventNames[selectedDate] && (
-            <Text style={unique_styles.eventName}>{eventNames[selectedDate]}</Text>
-          )}
-          {eventNames[selectedDate] ? (
-            <CustomButton title="Remove Event" onPress={handleRemoveEvent}/>
-          ) : (
-            <View>
-              <TextInput
-                style={styles.input}
-                placeholder="Event Name"
-                value={newEventName}
-                onChangeText={(text) => setNewEventName(text)}
-              />
-              <CustomButton title="Add Event" onPress={handleAddEvent}/>
-            </View>
-          )}
         </View>
       )}
     </View>
@@ -136,28 +135,6 @@ const unique_styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
-  },
-  eventName: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  customButton: {
-    alignItems: "center",
-    padding: 10,
-    borderRadius: 5,
-    margin: 5,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-  },
-  eventInput: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-    padding: 8,
   },
 });
 
