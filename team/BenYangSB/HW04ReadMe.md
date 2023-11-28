@@ -2,9 +2,12 @@ Added Files:
 
 giftGiving2.0/src/components/Notification.js
 
+Affected folders:
+App.js, Notification.js
 
-This file contains the logic to add notification preferences to firebase and allow users to get updates / push 
-notifications about upcoming gifts if they desire.
+Notification file contains the logic to add notification preferences to firebase and allow users to get updates / push notifications about upcoming gifts if they desire.
+
+These changes are added to a Tab in App.js
 
 The user can go onto the page, check/uncheck the notofication preferecnes, and also enter an offset that represents 
 the amount of days before the event in which they would like to recieve updates.
