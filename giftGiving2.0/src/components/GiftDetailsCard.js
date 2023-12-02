@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { Card } from "react-native-elements";
 import { styles } from "../styles";
-import { deleteDoc } from "firebase/firestore";
+import { deleteDoc, collection, query, where } from "firebase/firestore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { getFirestore, doc } from "firebase/firestore";
 
@@ -16,6 +16,7 @@ const GiftDetailsCard = ({
   decidedGift,
   id,
   updateGifts,
+  username,
 }) => {
   const formatDate = (unixTimestamp) => {
     const dateObject = new Date(unixTimestamp);
@@ -37,8 +38,29 @@ const GiftDetailsCard = ({
           const giftRef = doc(db, "gifts", id);
 
           try {
-            await deleteDoc(giftRef);
-            updateGifts();
+            // Remove the giftID from the user's gifts list
+            const usersRef = collection(db, "users");
+            const userQuery = query(
+              usersRef,
+              where("username", "==", username)
+            );
+            const userQuerySnapshot = await getDocs(userQuery);
+
+            if (!userQuerySnapshot.empty) {
+              const userDoc = userQuerySnapshot.docs[0];
+              const userId = userDoc.id;
+
+              // Update the user document to remove the giftID from the gifts array
+              await updateDoc(doc(db, "users", userId), {
+                gifts: arrayRemove(id),
+              });
+
+              // Delete the gift document
+              await deleteDoc(giftRef);
+
+              // Update the gifts in the parent component
+              updateGifts();
+            }
           } catch (error) {
             console.log("Error deleting gift: ", error);
           }

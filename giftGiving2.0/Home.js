@@ -99,6 +99,7 @@ function HomeScreen(props) {
             decidedGift={giftCard.decidedGift}
             id={giftCard.id}
             updateGifts={fetchUserGifts}
+            username={toString(username)}
           />
         ))}
         <Text style={styles.pageHeader}>Upcoming Gifts</Text>
